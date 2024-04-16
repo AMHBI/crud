@@ -1,7 +1,11 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Button, TextField } from "@mui/material";
 import React, { useState } from "react";
-import { CREATE_CUSTOMER, PUBLISH_USER } from "../../gql/mutaions";
+import {
+  CREATE_CUSTOMER,
+  PUBLISH_USER,
+  UPDATE_CUSTOMER,
+} from "../../gql/mutaions";
 import { GET_CUSTOMERS } from "../../gql/queries";
 const CustomerInputs = ({
   id,
@@ -12,7 +16,9 @@ const CustomerInputs = ({
   name,
   description,
   date,
-  setReFetch,
+  buttonStatus,
+  setButtonStatus,
+  updateUI
 }) => {
   const [addCustomer, { data, error, loading }] = useMutation(CREATE_CUSTOMER, {
     variables: {
@@ -30,11 +36,28 @@ const CustomerInputs = ({
       GET_CUSTOMERS,
     },
   });
+  const [updateCustomerById, {}] = useMutation(UPDATE_CUSTOMER);
   const submitHandler = async () => {
     await addCustomer();
     await publishCustomerById();
-
+    updateUI();
     console.log(data);
+  };
+  const editHandler = async () => {
+    await updateCustomerById({
+      variables: {
+        id,
+        name,
+        date,
+        description,
+      },
+      refetchQueries:{
+        GET_CUSTOMERS
+      }
+    });
+    await publishCustomerById();
+    setButtonStatus("add");
+    updateUI();
   };
   return (
     <React.Fragment>
@@ -63,7 +86,15 @@ const CustomerInputs = ({
         label='تاریخ'
         placeholder='تاریخ'
       />
-      <Button onClick={submitHandler}>Create Customer</Button>
+      {buttonStatus === "edit" ? (
+        <Button onClick={editHandler} variant='contained'>
+          ویرایش مشتری
+        </Button>
+      ) : (
+        <Button onClick={submitHandler} variant='contained'>
+          افزودن مشتری
+        </Button>
+      )}
     </React.Fragment>
   );
 };

@@ -34,5 +34,26 @@ const DELETE_CUSTOMER = gql`
     }
   }
 `;
+const UPDATE_CUSTOMER = gql`
+  mutation updateCustomerById(
+    $id: Int
+    $name: String
+    $description: String
+    $date: Date
+  ) {
+    updateCustomer(
+      data: {
+        customerId: $id
+        customerName: $name
+        customerDescription: $description
+        customerCreateDate: $date
+      }
+      where: { customerId: $id }
+    ) {
+      customerId
+      customerName
+    }
+  }
+`;
 
-export { CREATE_CUSTOMER, PUBLISH_USER, DELETE_CUSTOMER };
+export { CREATE_CUSTOMER, PUBLISH_USER, DELETE_CUSTOMER, UPDATE_CUSTOMER };

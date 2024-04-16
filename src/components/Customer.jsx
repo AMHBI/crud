@@ -7,7 +7,11 @@ const Customer = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
-  const [reFetch,setReFetch] = useState(false)
+  const [buttonStatus, setButtonStatus] = useState("add");
+  const [updateFlag, setUpdateFlag] = useState(false);
+  const updateUI = () => {
+    setUpdateFlag(!updateFlag); // Toggle update flag to trigger re-render
+  };
   return (
     <>
       <CustomerInputs
@@ -19,7 +23,9 @@ const Customer = () => {
         name={name}
         description={description}
         date={date}
-        setReFetch={setReFetch}
+        buttonStatus={buttonStatus}
+        setButtonStatus={setButtonStatus}
+        updateUI={updateUI}
       />
       <CustomersTable
         id={id}
@@ -30,9 +36,9 @@ const Customer = () => {
         name={name}
         description={description}
         date={date}
-        reFetch={reFetch}
-        setReFetch={setReFetch}
-
+        setButtonStatus={setButtonStatus}
+        updateUI={updateUI}
+        updateFlag={updateFlag} 
       />
     </>
   );

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_CUSTOMERS } from "../../gql/queries";
+import { DELETE_CUSTOMER, UPDATE_CUSTOMER } from "../../gql/mutaions";
 
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,23 +14,23 @@ import Paper from "@mui/material/Paper";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton, Tooltip } from "@mui/material";
-import { DELETE_CUSTOMER } from "../../gql/mutaions";
 
-const CustomersTable = ({ reFetch, setReFetch }) => {
-  const [id, setId] = useState(null);
+const CustomersTable = ({
+  setButtonStatus,
+  setId,
+  setName,
+  setDescription,
+  setDate,
+  updateFlag,
+  updateUI
+}) => {
   const { data, error, loading } = useQuery(GET_CUSTOMERS);
   const [customersData, setCustomersData] = useState([]);
 
   useEffect(() => {
     if (data) setCustomersData(data.customers);
-  }, [data]);
+  }, [data, updateFlag]);
 
-  useEffect(() => {
-    if (reFetch) {
-      setCustomersData(data.customers);
-      setReFetch(false);
-    }
-  }, [reFetch]);
   const [deleteCustomerById, {}] = useMutation(DELETE_CUSTOMER);
 
   const deleteHandler = (deleteId) => {
@@ -41,8 +42,15 @@ const CustomersTable = ({ reFetch, setReFetch }) => {
         GET_CUSTOMERS,
       },
     });
+    updateUI();
   };
-  const editHandler = (id) => {};
+  const editHandler = (customer) => {
+    setButtonStatus("edit");
+    setId(customer.customerId);
+    setName(customer.customerName);
+    setDescription(customer.customerDescription);
+    setDate(customer.customerCreateDate);
+  };
   console.log(data, error, loading);
 
   if (loading) return <h1>Loading...</h1>;
@@ -74,7 +82,7 @@ const CustomersTable = ({ reFetch, setReFetch }) => {
                   <TableCell align='right'>{i.customerCreateDate}</TableCell>
                   <TableCell align='right'>
                     <Tooltip title='ویرایش' arrow enterDelay={2000}>
-                      <IconButton onClick={() => editHandler(i.customerId)}>
+                      <IconButton onClick={() => editHandler(i)}>
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
